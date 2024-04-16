@@ -3,7 +3,7 @@ using DataAccess.Generic.Interface;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
-namespace DataAccess.Data.Ef
+namespace DataAccess.Generic.Ef
 {
     public class EFTRepository<T> : ITRepository<T>
         where T : class, new()
