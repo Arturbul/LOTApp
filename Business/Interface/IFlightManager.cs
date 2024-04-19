@@ -4,7 +4,7 @@ using Core.ViewModels;
 
 namespace Business.Interface
 {
-    public interface IFlightManager : ITManager<Flight, FlightViewModel>
+    public interface IFlightManager : ITManager<Flight, FlightViewModel, int>
     {
     }
 }
