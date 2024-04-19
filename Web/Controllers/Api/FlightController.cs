@@ -53,9 +53,13 @@ namespace Web.Controllers.Api
             return NotFound(result);
         }
 
-        [HttpPost("update")]
-        public async Task<IActionResult> Update(FlightViewModel flightVM)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, FlightViewModel flightVM)
         {
+            if (id != flightVM.Id)
+            {
+                return BadRequest("Id mismatch");
+            }
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
