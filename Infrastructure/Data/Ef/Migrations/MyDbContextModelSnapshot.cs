@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace DataAccess.Data.Ef.Migrations
+namespace DataAccess.data.ef.migrations
 {
     [DbContext(typeof(MyDbContext))]
     partial class MyDbContextModelSnapshot : ModelSnapshot
@@ -43,7 +43,7 @@ namespace DataAccess.Data.Ef.Migrations
 
                     b.Property<string>("FlightNumber")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("NVARCHAR(6)");
 
                     b.Property<int>("PlaneType")
                         .HasColumnType("int");

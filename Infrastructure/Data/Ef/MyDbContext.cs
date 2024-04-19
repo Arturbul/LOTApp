@@ -11,6 +11,20 @@ namespace DataAccess.Ef.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder
+                .Entity<Flight>()
+                .Property(b => b.FlightNumber)
+                .HasConversion(v => v.ToUpper(), v => v.ToUpper());
+
+            modelBuilder
+                .Entity<Flight>()
+                .Property(b => b.DepartLocation)
+                .HasConversion(v => v.ToUpper(), v => v.ToUpper());
+
+            modelBuilder
+                .Entity<Flight>()
+                .Property(b => b.ArrivalLocation)
+                .HasConversion(v => v.ToUpper(), v => v.ToUpper());
             //relations
         }
     }

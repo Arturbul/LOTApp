@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.data.ef.migrations
 {
     [DbContext(typeof(MyDbContext))]
-    [Migration("20240418162706_m3")]
-    partial class m3
+    [Migration("20240419132250_m1")]
+    partial class m1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -46,7 +46,7 @@ namespace DataAccess.data.ef.migrations
 
                     b.Property<string>("FlightNumber")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("NVARCHAR(6)");
 
                     b.Property<int>("PlaneType")
                         .HasColumnType("int");
