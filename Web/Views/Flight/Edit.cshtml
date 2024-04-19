@@ -1,0 +1,35 @@
+﻿@model Core.ViewModels.FlightViewModel
+
+@{
+    ViewBag.Title = "Edit flight";
+}
+<h1>@ViewBag.Title</h1>
+<form asp-action="Edit">
+    <div asp-validation-summary="ModelOnly"></div>
+    <div>
+        <label asp-for="FlightNumber"></label>
+        <input asp-for="FlightNumber" />
+        <span asp-validation-for="FlightNumber"></span>
+    </div>
+    <div>
+        <label asp-for="DepartTime"></label>
+        <input asp-for="DepartTime" />
+        <span asp-validation-for="DepartTime"></span>
+    </div>
+    <div>
+        <label asp-for="DepartLocation"></label>
+        <input asp-for="DepartLocation" />
+        <span asp-validation-for="DepartLocation"></span>
+    </div>
+    <div>
+        <label asp-for="ArrivalLocation"></label>
+        <input asp-for="ArrivalLocation" />
+        <span asp-validation-for="ArrivalLocation"></span>
+    </div>
+    <div>
+        <label asp-for="PlaneType"></label>
+        <input asp-for="PlaneType" />
+        <span asp-validation-for="PlaneType"></span>
+    </div>
+    <input type="submit" value="Edit" />
+</form>

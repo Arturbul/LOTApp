@@ -1,0 +1,49 @@
+﻿@model IEnumerable<Core.ViewModels.FlightViewModel>
+
+@{
+    ViewBag.Title = "Flights";
+}
+
+<h1>@ViewBag.Title</h1>
+<div>
+    <form>
+        <button asp-action="Create">Create new</button>
+    </form>
+</div>
+
+<table>
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(m => m.Id)</th>
+            <th>@Html.DisplayNameFor(m => m.FlightNumber)</th>
+            <th>@Html.DisplayNameFor(m => m.DepartTime)</th>
+            <th>@Html.DisplayNameFor(m => m.DepartLocation)</th>
+            <th>@Html.DisplayNameFor(m => m.ArrivalLocation)</th>
+            <th>@Html.DisplayNameFor(m => m.PlaneType)</th>
+            <th>Manage</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if(Model != null)
+        {
+            @foreach (var flight in Model)
+            {
+                <tr>
+                    <td>@Html.DisplayFor(m => flight.Id)</td>
+                    <td>@Html.DisplayFor(m => flight.FlightNumber)</td>
+                    <td>@Html.DisplayFor(m => flight.DepartTime)</td>
+                    <td>@Html.DisplayFor(m => flight.DepartLocation)</td>
+                    <td>@Html.DisplayFor(m => flight.ArrivalLocation)</td>
+                    <td>@Html.DisplayFor(m => flight.PlaneType)</td>
+                    <td>
+                        <form>
+                            <button asp-action="Details" asp-route-id="@flight.Id">Details</button>
+                            <button asp-action="Edit" asp-route-id="@flight.Id">Edit</button>
+                            <button asp-action="Remove" asp-route-id="@flight.Id">Remove</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
