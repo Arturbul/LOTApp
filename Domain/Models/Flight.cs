@@ -10,7 +10,7 @@ namespace Core.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         [Required]
-        public int FlightNumber { get; set; }
+        public string FlightNumber { get; set; } = null!;
         public DateTime DepartTime { get; set; }
         public string DepartLocation { get; set; } = null!;
         public string ArrivalLocation { get; set; } = null!;
