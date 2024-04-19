@@ -27,13 +27,13 @@ namespace Web.Controllers.Razor.Flight
             return View(flight);
         }
 
-        public IActionResult Create()
+        public IActionResult Add()
         {
             return View();
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(FlightViewModel flightVM)
+        public async Task<IActionResult> Add(FlightViewModel flightVM)
         {
             if (ModelState.IsValid)
             {
@@ -74,7 +74,7 @@ namespace Web.Controllers.Razor.Flight
             return View(flightVM);
         }
 
-        public IActionResult Delete(int? id)
+        public IActionResult Remove(int? id)
         {
             if (id == null)
             {
@@ -83,8 +83,8 @@ namespace Web.Controllers.Razor.Flight
             return View();
         }
 
-        [HttpPost, ActionName("Delete")]
-        public async Task<IActionResult> DeleteConfirmation(int id)
+        [HttpPost, ActionName("Remove")]
+        public async Task<IActionResult> RemoveConfirmation(int id)
         {
             var result = await _flightManager.Delete(id);
             return RedirectToAction(nameof(Index));
