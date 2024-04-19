@@ -15,7 +15,7 @@ namespace DataAccess.Generic.Ef
         }
 
         //GET
-        public async Task<IEnumerable<T>> Get(Expression<Func<T, bool>>? expression)
+        public async Task<IEnumerable<T>> Get(Expression<Func<T, bool>>? expression = null)
         {
             if (expression != null)
             {

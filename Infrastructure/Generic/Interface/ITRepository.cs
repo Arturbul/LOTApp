@@ -5,7 +5,7 @@ namespace DataAccess.Generic.Interface
     public interface ITRepository<T>
         where T : class, new()
     {
-        Task<IEnumerable<T>> Get(Expression<Func<T, bool>>? expression);
+        Task<IEnumerable<T>> Get(Expression<Func<T, bool>>? expression = null);
         Task<T?> GetSingle(Expression<Func<T, bool>> expression);
         Task<T> Create(T entity);
         Task<T> Update(T entity);

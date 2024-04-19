@@ -1,6 +1,9 @@
-﻿namespace DataAccess.Interface
+﻿using Core.Models;
+using DataAccess.Generic.Interface;
+
+namespace DataAccess.Interface
 {
-    public interface IFlightRepository
+    public interface IFlightRepository : ITRepository<Flight>
     {
     }
 }
