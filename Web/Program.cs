@@ -1,5 +1,6 @@
 using Business.Profiles;
 using Core.Authentication;
+using Core.Identity;
 using DataAccess.Ef.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -44,7 +45,11 @@ builder.Services.AddAuthentication(options =>
         OnTokenValidated = ctx => LogAttempt(ctx.Request.Headers, "OnTokenValidated")
     };
 });
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy(IdentityData.AdminUserPolicyName, p =>
+        p.RequireClaim(IdentityData.AdminUserClaimName, "true"));
+});
 
 
 //Controllers
@@ -133,6 +138,5 @@ Task LogAttempt(IHeaderDictionary headers, string eventType)
 
         logger.LogInformation($"{eventType}. Expiration: {jwt.ValidTo.ToLongTimeString()}. System time: {DateTime.UtcNow.ToLongTimeString()}");
     }
-
     return Task.CompletedTask;
 }

@@ -1,4 +1,5 @@
 ﻿using Core.Authentication;
+using Core.Identity;
 using Core.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -44,6 +45,7 @@ namespace Web.Controllers.Api
                 UserName = model.UserName,
                 Email = model.Email,
                 SecurityStamp = Guid.NewGuid().ToString(),
+                Role = model.Role,
             };
 
             var result = await _userManager.CreateAsync(newUser, model.Password);
@@ -70,7 +72,7 @@ namespace Web.Controllers.Api
             {
                 return Unauthorized();
             }
-            JwtSecurityToken token = GenerateJwt(model.UserName);
+            JwtSecurityToken token = GenerateJwt(model.UserName, user.Role);
 
             var refreshToken = GenerateRefreshToken();
 
@@ -111,7 +113,7 @@ namespace Web.Controllers.Api
                 return Unauthorized();
             }
 
-            var token = GenerateJwt(principal.Identity.Name);
+            var token = GenerateJwt(principal.Identity.Name, user.Role);
 
             _logger.LogInformation($"Refresh succeeded");
             return Ok(new LoginResponse
@@ -168,13 +170,20 @@ namespace Web.Controllers.Api
             return new JwtSecurityTokenHandler().ValidateToken(token, validation, out _);
         }
 
-        private JwtSecurityToken GenerateJwt(string username)
+        private JwtSecurityToken GenerateJwt(string username, string? role = null)
         {
+
             var authClaims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, username),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()) //revent replay attack
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             };
+
+            if (role != null && IdentityData.AdminUserClaimName.Equals(role, StringComparison.OrdinalIgnoreCase))
+            {
+                authClaims.Add(new Claim("admin", true.ToString(), ClaimValueTypes.Boolean));
+            }
+
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
                 _configuration["JWT:Secret"] ?? throw new InvalidOperationException("Secret not configured")));
 

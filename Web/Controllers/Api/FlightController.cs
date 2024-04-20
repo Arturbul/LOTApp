@@ -1,7 +1,9 @@
 ﻿using Business.Interface;
+using Core.Identity;
 using Core.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Web.Attribiutes;
 
 namespace Web.Controllers.Api
 {
@@ -79,6 +81,7 @@ namespace Web.Controllers.Api
 
         //DELETE
         [Authorize]
+        [RequiresClaim(IdentityData.AdminUserClaimName, "true")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
