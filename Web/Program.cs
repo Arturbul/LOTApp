@@ -1,14 +1,80 @@
 using Business.Profiles;
+using Core.Authentication;
 using DataAccess.Ef.Data;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using System.IdentityModel.Tokens.Jwt;
 using System.Reflection;
+using System.Text;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+//Logger
+using var loggerFactory = LoggerFactory.Create(b => b.SetMinimumLevel(LogLevel.Trace).AddConsole());
+
+//JWT
+builder.Services.AddIdentity<AppUser, IdentityRole>()
+           .AddEntityFrameworkStores<MyDbContext>()
+           .AddDefaultTokenProviders();
+
+var secret = builder.Configuration["JWT:Secret"] ?? throw new InvalidOperationException("Secret not configured");
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.SaveToken = true;
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidIssuer = builder.Configuration["JWT:ValidIssuer"],
+        ValidAudience = builder.Configuration["JWT:ValidAudience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret))
+
+    };
+    options.Events = new JwtBearerEvents
+    {
+        OnChallenge = ctx => LogAttempt(ctx.Request.Headers, "OnChallenge"),
+        OnTokenValidated = ctx => LogAttempt(ctx.Request.Headers, "OnTokenValidated")
+    };
+});
+
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContextPool<MyDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("MsSQLLocalDB")));
+
+//Swagger
+builder.Services.AddSwaggerGen(options =>
+{
+    var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+
+    //Swagger JWT
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        In = ParameterLocation.Header,
+        Description = "Please enter 'Bearer [jwt]'",
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey
+    });
+
+    var scheme = new OpenApiSecurityScheme
+    {
+        Reference = new OpenApiReference
+        {
+            Type = ReferenceType.SecurityScheme,
+            Id = "Bearer"
+        }
+    };
+
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement { { scheme, Array.Empty<string>() } });
+});
 
 //DI
 Business.Dependencies.Register(builder.Services);
@@ -18,13 +84,6 @@ builder.Services.AddRazorPages();
 
 //Automapper
 builder.Services.AddAutoMapper(typeof(FlightProfile));
-
-//Swagger
-builder.Services.AddSwaggerGen(options =>
-{
-    var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-    options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
-});
 
 var app = builder.Build();
 
@@ -42,6 +101,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
@@ -49,3 +109,26 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
+
+
+
+//Methods
+Task LogAttempt(IHeaderDictionary headers, string eventType)
+{
+    var logger = loggerFactory.CreateLogger<Program>();
+
+    var authorizationHeader = headers["Authorization"].FirstOrDefault();
+
+    if (authorizationHeader is null)
+        logger.LogInformation($"{eventType}. JWT not present");
+    else
+    {
+        string jwtString = authorizationHeader.Substring("Bearer ".Length);
+
+        var jwt = new JwtSecurityToken(jwtString);
+
+        logger.LogInformation($"{eventType}. Expiration: {jwt.ValidTo.ToLongTimeString()}. System time: {DateTime.UtcNow.ToLongTimeString()}");
+    }
+
+    return Task.CompletedTask;
+}

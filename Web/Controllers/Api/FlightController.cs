@@ -1,9 +1,11 @@
 ﻿using Business.Interface;
 using Core.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Web.Controllers.Api
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class FlightController : Controller
