@@ -17,6 +17,7 @@ namespace Web.Controllers.Api
         }
 
         //GET
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> Get()
         {
@@ -27,7 +28,7 @@ namespace Web.Controllers.Api
             }
             return Ok(flights.OrderBy(o => o.ArrivalLocation));
         }
-
+        [AllowAnonymous]
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
@@ -40,6 +41,7 @@ namespace Web.Controllers.Api
         }
 
         //POST
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> Create(FlightViewModel flightVM)
         {
@@ -55,6 +57,7 @@ namespace Web.Controllers.Api
             return NotFound(result);
         }
 
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, FlightViewModel flightVM)
         {
@@ -75,6 +78,7 @@ namespace Web.Controllers.Api
         }
 
         //DELETE
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {

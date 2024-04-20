@@ -35,8 +35,8 @@ builder.Services.AddAuthentication(options =>
     {
         ValidIssuer = builder.Configuration["JWT:ValidIssuer"],
         ValidAudience = builder.Configuration["JWT:ValidAudience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret))
-
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret)),
+        ClockSkew = TimeSpan.FromSeconds(5)
     };
     options.Events = new JwtBearerEvents
     {
@@ -44,8 +44,13 @@ builder.Services.AddAuthentication(options =>
         OnTokenValidated = ctx => LogAttempt(ctx.Request.Headers, "OnTokenValidated")
     };
 });
+builder.Services.AddAuthorization();
 
+
+//Controllers
 builder.Services.AddControllersWithViews();
+
+//DbContext
 builder.Services.AddDbContextPool<MyDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("MsSQLLocalDB")));
 
@@ -109,7 +114,6 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
-
 
 
 //Methods
