@@ -16,12 +16,10 @@ namespace LOTApp.Core.Models
         public DateTime DepartTime { get; set; }
 
         [Required(AllowEmptyStrings = false)]
-        [DisplayFormat(ConvertEmptyStringToNull = false)]
         [RegularExpression(@"^[a-zA-Z]{3}$$", ErrorMessage = "required IATA Airport Commercial service mark")]
         public string DepartLocation { get; set; } = null!;
 
         [Required(AllowEmptyStrings = false)]
-        [DisplayFormat(ConvertEmptyStringToNull = false)]
         [RegularExpression(@"^[a-zA-Z]{3}$$", ErrorMessage = "required IATA Airport Commercial service mark")]
         public string ArrivalLocation { get; set; } = null!;
         public PlaneType PlaneType { get; set; }
