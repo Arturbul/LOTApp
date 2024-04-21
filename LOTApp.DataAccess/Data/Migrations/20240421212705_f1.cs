@@ -3,20 +3,14 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace DataAccess.data.ef.migrations.jwt
+namespace LOTApp.DataAccess.data.migrations
 {
     /// <inheritdoc />
-    public partial class jwt1 : Migration
+    public partial class f1 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<string>(
-                name: "AppUserId",
-                table: "Flights",
-                type: "nvarchar(450)",
-                nullable: true);
-
             migrationBuilder.CreateTable(
                 name: "AspNetRoles",
                 columns: table => new
@@ -37,7 +31,9 @@ namespace DataAccess.data.ef.migrations.jwt
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Discriminator = table.Column<string>(type: "nvarchar(13)", maxLength: 13, nullable: false),
-                    FlightsAllowed = table.Column<bool>(type: "bit", nullable: true),
+                    RefreshToken = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    RefreshTokenExpiry = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Role = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -56,6 +52,23 @@ namespace DataAccess.data.ef.migrations.jwt
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Flights",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    FlightNumber = table.Column<string>(type: "NVARCHAR(6)", nullable: false),
+                    DepartTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DepartLocation = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ArrivalLocation = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PlaneType = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Flights", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -165,11 +178,6 @@ namespace DataAccess.data.ef.migrations.jwt
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Flights_AppUserId",
-                table: "Flights",
-                column: "AppUserId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
                 column: "RoleId");
@@ -207,22 +215,11 @@ namespace DataAccess.data.ef.migrations.jwt
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Flights_AspNetUsers_AppUserId",
-                table: "Flights",
-                column: "AppUserId",
-                principalTable: "AspNetUsers",
-                principalColumn: "Id");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_Flights_AspNetUsers_AppUserId",
-                table: "Flights");
-
             migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
 
@@ -239,18 +236,13 @@ namespace DataAccess.data.ef.migrations.jwt
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "Flights");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
-
-            migrationBuilder.DropIndex(
-                name: "IX_Flights_AppUserId",
-                table: "Flights");
-
-            migrationBuilder.DropColumn(
-                name: "AppUserId",
-                table: "Flights");
         }
     }
 }

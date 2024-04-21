@@ -9,11 +9,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace DataAccess.data.ef.migrations.jwt
+namespace LOTApp.DataAccess.data.migrations
 {
     [DbContext(typeof(LOTContext))]
-    [Migration("20240420200641_claim1")]
-    partial class claim1
+    [Migration("20240421212705_f1")]
+    partial class f1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,16 +25,13 @@ namespace DataAccess.data.ef.migrations.jwt
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Core.Models.Flight", b =>
+            modelBuilder.Entity("LOTApp.Core.Models.Flight", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("AppUserId")
-                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ArrivalLocation")
                         .IsRequired()
@@ -55,8 +52,6 @@ namespace DataAccess.data.ef.migrations.jwt
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("AppUserId");
 
                     b.ToTable("Flights");
                 });
@@ -268,7 +263,7 @@ namespace DataAccess.data.ef.migrations.jwt
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Core.Authentication.AppUser", b =>
+            modelBuilder.Entity("LOTApp.Core.Authentication.AppUser", b =>
                 {
                     b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
 
@@ -282,13 +277,6 @@ namespace DataAccess.data.ef.migrations.jwt
                         .HasColumnType("nvarchar(max)");
 
                     b.HasDiscriminator().HasValue("AppUser");
-                });
-
-            modelBuilder.Entity("Core.Models.Flight", b =>
-                {
-                    b.HasOne("Core.Authentication.AppUser", null)
-                        .WithMany("FlightsModified")
-                        .HasForeignKey("AppUserId");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -340,11 +328,6 @@ namespace DataAccess.data.ef.migrations.jwt
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("Core.Authentication.AppUser", b =>
-                {
-                    b.Navigation("FlightsModified");
                 });
 #pragma warning restore 612, 618
         }
