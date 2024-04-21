@@ -1,6 +1,8 @@
+using FluentValidation;
 using LOTApp.Business;
 using LOTApp.Business.Mappers;
 using LOTApp.Core.Authentication;
+using LOTApp.Core.ViewModels;
 using LOTApp.DataAccess.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -101,6 +103,9 @@ public class Program
 
         //Automapper
         builder.Services.AddAutoMapper(typeof(FlightProfile));
+
+        //FluentValidation
+        builder.Services.AddScoped<IValidator<FlightViewModel>, FlightViewModelValidator>();
 
         var app = builder.Build();
 

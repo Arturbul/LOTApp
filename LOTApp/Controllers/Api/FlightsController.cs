@@ -1,6 +1,8 @@
-﻿using LOTApp.Attribiutes;
+﻿using FluentValidation;
+using LOTApp.Attribiutes;
 using LOTApp.Business.Services;
 using LOTApp.Core.Authentication;
+using LOTApp.Core.Extensions;
 using LOTApp.Core.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,19 +14,21 @@ namespace LOTApp.Controllers.Api
     [Route("api/flights")]
     public class FlightsController : Controller
     {
-        private readonly IFlightService _flightManager;
-        public FlightsController(IFlightService flightManager)
+        private readonly IFlightService _flightService;
+        private readonly IValidator<FlightViewModel> _validator;
+        public FlightsController(IFlightService flightManager, IValidator<FlightViewModel> validator)
         {
-            _flightManager = flightManager;
+            _flightService = flightManager;
+            _validator = validator;
         }
 
         //GET
         [AllowAnonymous]
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<FlightViewModel>))]
-        public async Task<IActionResult> Get(int? id, string? flightNumber, DateTime? departTimeFrom, DateTime? departTimeTo, string? departLocation, string? arrivalLocation, int? planeType)
+        public IActionResult Get(int? id, string? flightNumber, DateTime? departTimeFrom, DateTime? departTimeTo, string? departLocation, string? arrivalLocation, int? planeType)
         {
-            var flights = await _flightManager.Get(id, flightNumber, departTimeFrom, departTimeTo, departLocation, arrivalLocation, planeType);
+            var flights = _flightService.Get(id, flightNumber, departTimeFrom, departTimeTo, departLocation, arrivalLocation, planeType);
             if (flights == null)
             {
                 return NotFound();
@@ -33,9 +37,9 @@ namespace LOTApp.Controllers.Api
         }
         [AllowAnonymous]
         [HttpGet("{id}")]
-        public async Task<IActionResult> Get(int id)
+        public IActionResult Get(int id)
         {
-            var flight = await _flightManager.GetSingle(id);
+            var flight = _flightService.GetSingle(id);
             if (flight == null)
             {
                 return NotFound();
@@ -48,11 +52,14 @@ namespace LOTApp.Controllers.Api
         [HttpPost]
         public async Task<IActionResult> Create(FlightViewModel flightVM)
         {
-            if (!ModelState.IsValid)
+            var validationResult = await _validator.ValidateAsync(flightVM);
+            if (!ModelState.IsValid || !validationResult.IsValid)
             {
+                validationResult.AddToModelState(this.ModelState);
                 return BadRequest(ModelState);
             }
-            var result = await _flightManager.Create(flightVM);
+
+            var result = await _flightService.Create(flightVM);
             if (ModelState.IsValid)
             {
                 return Ok(result);
@@ -72,7 +79,7 @@ namespace LOTApp.Controllers.Api
             {
                 return BadRequest(ModelState);
             }
-            var result = await _flightManager.Update(flightVM);
+            var result = await _flightService.Update(flightVM);
             if (ModelState.IsValid)
             {
                 return Ok(result);
@@ -86,7 +93,7 @@ namespace LOTApp.Controllers.Api
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var result = await _flightManager.Delete(id);
+            var result = await _flightService.Delete(id);
             if (result == 0)
             {
                 return NotFound(result);
