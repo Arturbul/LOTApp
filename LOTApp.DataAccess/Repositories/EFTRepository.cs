@@ -1,7 +1,6 @@
 ﻿using LOTApp.DataAccess.Common;
 using LOTApp.DataAccess.Data;
 using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
 
 namespace LOTApp.DataAccess.Repositories
 {
@@ -16,24 +15,6 @@ namespace LOTApp.DataAccess.Repositories
 
         public IQueryable<T> AllEntities => _context.Set<T>();
 
-        //GET
-        public async Task<IEnumerable<T>> Get(Expression<Func<T, bool>>? expression = null)
-        {
-            if (expression != null)
-            {
-                return await _context.Set<T>()
-                    .Where(expression)
-                    .ToListAsync();
-            }
-            return await _context.Set<T>().ToListAsync();
-        }
-
-        public async Task<T?> GetSingle(Expression<Func<T, bool>> expression)
-        {
-            return await _context.Set<T>().SingleOrDefaultAsync(expression);
-        }
-
-        //POST
         public async Task<T> Create(T entity)
         {
             var added = _context.Entry(entity);
