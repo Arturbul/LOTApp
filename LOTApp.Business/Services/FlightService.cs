@@ -15,20 +15,15 @@ namespace LOTApp.Business.Services
             _repository = repository;
         }
 
-        public IQueryable<FlightViewModel> AllEntities => _mapper.Map<IQueryable<FlightViewModel>>(_repository.AllEntities);
-
-        public async Task<IEnumerable<FlightViewModel>> Get()
-        {
-            var flights = await _repository.Get();
-            return _mapper.Map<IEnumerable<FlightViewModel>>(flights);
-        }
-
-        public async Task<IEnumerable<FlightViewModel>> Get(
-            int? id, string? flightNumber,
-            DateTime? departTimeFrom, DateTime? departTimeTo,
-            string? departLocation,
-            string? arrivalLocation,
-            int? planeType)
+        public IEnumerable<FlightViewModel> Get(
+            int? id = null,
+            string? flightNumber = null,
+            DateTime? departTimeFrom = null,
+            DateTime? departTimeTo = null,
+            string? departLocation = null,
+            string? arrivalLocation = null,
+            int? planeType = null
+            )
         {
             var query = _repository.AllEntities;
 
@@ -39,12 +34,12 @@ namespace LOTApp.Business.Services
 
             if (departTimeFrom != null)
             {
-                query = query.Where(x => x.DepartTime.CompareTo(departTimeFrom) >= 0);
+                query = query.Where(x => x.DepartTime >= departTimeFrom);
             }
 
             if (departTimeTo != null)
             {
-                query = query.Where(x => x.DepartTime.CompareTo(departTimeTo) <= 0);
+                query = query.Where(x => x.DepartTime <= departTimeTo);
             }
 
             if (!string.IsNullOrEmpty(flightNumber))
@@ -70,10 +65,9 @@ namespace LOTApp.Business.Services
             return _mapper.Map<IEnumerable<FlightViewModel>>(query.ToList());
         }
 
-        public async Task<FlightViewModel?> GetSingle(int id)
+        public FlightViewModel? GetSingle(int id)
         {
-            var flight = await _repository.GetSingle(x => x.Id == id);
-            return _mapper.Map<FlightViewModel>(flight);
+            return _mapper.Map<FlightViewModel>(_repository.AllEntities.SingleOrDefault(x => x.Id == id));
         }
         public async Task<FlightViewModel> Create(FlightViewModel entityVM)
         {
@@ -91,7 +85,7 @@ namespace LOTApp.Business.Services
         }
         public async Task<int> Delete(int id)
         {
-            var entity = await _repository.GetSingle(x => x.Id == id);
+            var entity = _repository.AllEntities.SingleOrDefault(x => x.Id == id);
             if (entity == null)
             {
                 return 0;
