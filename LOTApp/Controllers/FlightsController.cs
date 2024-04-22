@@ -9,7 +9,7 @@ using LOTApp.Core.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace LOTApp.Controllers.Api
+namespace LOTApp.Controllers
 {
     [ApiController]
     [Route("api/flights")]
@@ -122,7 +122,7 @@ namespace LOTApp.Controllers.Api
             var validationResult = await _createFlightValidator.ValidateAsync(flightDTO);
             if (!ModelState.IsValid || !validationResult.IsValid)
             {
-                validationResult.AddToModelState(this.ModelState);
+                validationResult.AddToModelState(ModelState);
                 return BadRequest(ModelState);
             }
 
@@ -174,7 +174,7 @@ namespace LOTApp.Controllers.Api
             var validationResult = await _viewModelValidator.ValidateAsync(flightVM);
             if (!ModelState.IsValid || !validationResult.IsValid)
             {
-                validationResult.AddToModelState(this.ModelState);
+                validationResult.AddToModelState(ModelState);
                 return BadRequest(ModelState);
             }
             var result = await _flightService.Update(flightVM);

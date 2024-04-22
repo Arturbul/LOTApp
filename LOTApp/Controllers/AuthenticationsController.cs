@@ -8,7 +8,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace LOTApp.Controllers.Api
+namespace LOTApp.Controllers
 {
     [ApiController]
     [Route("api/authentications")]
