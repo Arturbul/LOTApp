@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using LOTApp.Core.DTOs;
 using LOTApp.Core.Models;
 using LOTApp.Core.ViewModels;
 
@@ -8,8 +9,9 @@ namespace LOTApp.Business.Mappers
     {
         public FlightProfile()
         {
-            CreateMap<Flight, FlightViewModel>();
-            CreateMap<FlightViewModel, Flight>();
+            CreateMap<Flight, FlightViewModel>().ReverseMap();
+            CreateMap<FlightViewModel, CreateFlightDTO>().ReverseMap();
+            CreateMap<Flight, CreateFlightDTO>().ReverseMap();
         }
     }
 }

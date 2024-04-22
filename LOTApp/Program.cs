@@ -2,6 +2,7 @@ using FluentValidation;
 using LOTApp.Business;
 using LOTApp.Business.Mappers;
 using LOTApp.Core.Authentication;
+using LOTApp.Core.DTOs;
 using LOTApp.Core.ViewModels;
 using LOTApp.DataAccess.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -106,6 +107,8 @@ public class Program
 
         //FluentValidation
         builder.Services.AddScoped<IValidator<FlightViewModel>, FlightViewModelValidator>();
+        builder.Services.AddScoped<IValidator<CreateFlightDTO>, CreateFlightDTOValidator>();
+
 
         var app = builder.Build();
 

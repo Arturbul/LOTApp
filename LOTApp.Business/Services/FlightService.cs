@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using LOTApp.Core.DTOs;
 using LOTApp.Core.Models;
 using LOTApp.Core.ViewModels;
 using LOTApp.DataAccess.Repositories;
@@ -22,7 +23,7 @@ namespace LOTApp.Business.Services
             DateTime? departTimeTo = null,
             string? departLocation = null,
             string? arrivalLocation = null,
-            int? planeType = null
+            PlaneType? planeType = null
             )
         {
             var query = _repository.AllEntities;
@@ -69,9 +70,9 @@ namespace LOTApp.Business.Services
         {
             return _mapper.Map<FlightViewModel>(_repository.AllEntities.SingleOrDefault(x => x.Id == id));
         }
-        public async Task<FlightViewModel> Create(FlightViewModel entityVM)
+        public async Task<FlightViewModel> Create(CreateFlightDTO entityDTO)
         {
-            var entity = _mapper.Map<Flight>(entityVM);
+            var entity = _mapper.Map<Flight>(entityDTO);
             var result = await _repository.Create(entity);
 
             return _mapper.Map<FlightViewModel>(result);

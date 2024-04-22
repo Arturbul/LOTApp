@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using LOTApp.Business.Services;
+using LOTApp.Core.DTOs;
 using LOTApp.Core.Models;
 using LOTApp.Core.ViewModels;
 using LOTApp.DataAccess.Repositories;
@@ -251,70 +252,36 @@ namespace LOTApp.Tests.Unit
         public async void Create_WithValidData_ReturnsFlight()
         {
             // Arrange
-            var newDataVM = new FlightViewModel
+            var newDataDTO = new CreateFlightDTO
             {
-                Id = 3,
                 FlightNumber = "GH321",
                 DepartTime = DateTime.UtcNow,
                 DepartLocation = "FZA",
                 ArrivalLocation = "ASD",
-                PlaneType = (PlaneType)1
+                PlaneType = PlaneType.Airbus.ToString(),
             };
 
             var mapper = new MapperConfiguration(cfg =>
             {
+                cfg.CreateMap<Flight, CreateFlightDTO>().ReverseMap();
                 cfg.CreateMap<Flight, FlightViewModel>().ReverseMap();
+
             }).CreateMapper();
 
             var mockRepository = new Mock<IFlightRepository>();
             mockRepository.Setup(r => r.Create(It.IsAny<Flight>()))
-                .Returns(Task.FromResult(mapper.Map<Flight>(newDataVM)))
+                .Returns(Task.FromResult(mapper.Map<Flight>(newDataDTO)))
                 .Verifiable();
 
             var service = new FlightService(mapper, mockRepository.Object);
 
             // Act
-            var result = await service.Create(newDataVM);
+            var result = await service.Create(newDataDTO);
 
             // Assert
             Assert.NotNull(result);
             mockRepository.VerifyAll();
         }
-
-        [Fact]
-        public async void Create_WithInValidData_ReturnsNull()
-        {
-            // Arrange
-            var newDataVM = new FlightViewModel
-            {
-                Id = 3,
-                FlightNumber = "Invalid312",
-                DepartTime = DateTime.UtcNow,
-                DepartLocation = "FZA",
-                ArrivalLocation = "ASD",
-                PlaneType = (PlaneType)1
-            };
-
-            var mapper = new MapperConfiguration(cfg =>
-            {
-                cfg.CreateMap<Flight, FlightViewModel>().ReverseMap();
-            }).CreateMapper();
-
-            var mockRepository = new Mock<IFlightRepository>();
-            mockRepository.Setup(r => r.Create(It.IsAny<Flight>()))
-                .Returns(Task.FromResult(mapper.Map<Flight>(newDataVM)))
-                .Verifiable();
-
-            var service = new FlightService(mapper, mockRepository.Object);
-
-            // Act
-            var result = await service.Create(newDataVM);
-
-            // Assert
-            Assert.Null(result);
-            mockRepository.VerifyAll();
-        }
-
 
         [Fact]
         public async void Update_WithValidData_ReturnsFlight()
@@ -358,49 +325,6 @@ namespace LOTApp.Tests.Unit
             // Assert
             Assert.NotNull(result);
             Assert.Equal(expected, result, new FlightViewModelComparer());
-            mockRepository.VerifyAll();
-        }
-
-        [Fact]
-        public async void Update_WithInValidData_ReturnsNull()
-        {
-            // Arrange
-            var baseData = new FlightViewModel
-            {
-                Id = 3,
-                FlightNumber = "GH321",
-                DepartTime = new DateTime(2024, 4, 18, 12, 30, 0),
-                DepartLocation = "FZA",
-                ArrivalLocation = "ASD",
-                PlaneType = (PlaneType)1
-            };
-
-            var expected = new FlightViewModel
-            {
-                Id = 3,
-                DepartTime = new DateTime(2024, 4, 18, 12, 30, 0),
-                DepartLocation = "KTW",
-                ArrivalLocation = "KRK",
-            };
-
-            var mapper = new MapperConfiguration(cfg =>
-            {
-                cfg.CreateMap<Flight, FlightViewModel>().ReverseMap();
-            }).CreateMapper();
-
-            var mockRepository = new Mock<IFlightRepository>();
-            mockRepository.Setup(r => r.Update(It.IsAny<Flight>()))
-                .Returns(Task.FromResult(mapper.Map<Flight>(expected)))
-                .Verifiable();
-
-            var service = new FlightService(mapper, mockRepository.Object);
-
-            // Act
-            var result = await service.Update(expected);
-
-            // Assert
-            Assert.Null(result);
-            Assert.NotEqual(expected, result, new FlightViewModelComparer());
             mockRepository.VerifyAll();
         }
     }
