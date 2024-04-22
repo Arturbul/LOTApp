@@ -26,11 +26,11 @@ namespace LOTApp.DataAccess.Repositories
 
         public async Task<T> Update(T entity)
         {
-            var added = _context.Entry(entity);
-            added.State = EntityState.Modified;
+            var updated = _context.Entry(entity);
+            updated.State = EntityState.Modified;
 
             await _context.SaveChangesAsync();
-            return added.Entity;
+            return updated.Entity;
         }
         public async Task<int> Delete(T entity)
         {
