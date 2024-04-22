@@ -25,9 +25,18 @@ namespace LOTApp.Controllers.Api
             _logger = logger;
         }
 
+        /// <summary>
+        /// Registers a new user in the system.
+        /// </summary>
+        /// <param name="model">A RegistrationModel object containing the user's registration details.</param>
+        /// <returns>
+        ///   * Status201Created (no data): If the user is successfully registered, the method returns a 201 Created response with no content in the body.
+        ///   * Status409Conflict (no data): If a user with the same username already exists, the method returns a 409 Conflict response with a message indicating the conflict.
+        ///   * Status500InternalServerError (no data): If an unexpected error occurs during registration, the method returns a 500 Internal Server Error response with a generic error message. Consider providing more specific error details in a production environment.
+        /// </returns>
         [HttpPost("register")]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Register([FromBody] RegistrationModel model)
         {
@@ -51,12 +60,21 @@ namespace LOTApp.Controllers.Api
             {
                 _logger.LogInformation("Register succeeded");
 
-                return Ok(result);
+                return Created();
             }
             return StatusCode(StatusCodes.Status500InternalServerError,
                 $"Error: {result.Errors.Select(e => e.Description)}");
         }
 
+        /// <summary>
+        /// Logs in a user and generates a JWT token and refresh token for authentication.
+        /// </summary>
+        /// <param name="model">A LoginModel object containing the user's login credentials (username and password).</param>
+        /// <returns>
+        ///   * Status200OK (with data): If the login is successful, the method returns a 200 OK response with a LoginResponse object containing the JWT token, its expiration date, and the refresh token.
+        ///   * Status401Unauthorized (no data): If the username or password is incorrect, the method returns a 401 Unauthorized response.
+        ///   * Status500InternalServerError (no data): If an unexpected error occurs during login, the method returns a 500 Internal Server Error response with a generic error message. Consider providing more specific error details in a production environment. 
+        /// </returns>
         [HttpPost("login")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -90,6 +108,15 @@ namespace LOTApp.Controllers.Api
             });
         }
 
+        /// <summary>
+        /// Refreshes a JWT token using a previously issued refresh token.
+        /// </summary>
+        /// <param name="model">A RefreshModel object containing the expired access token and the refresh token.</param>
+        /// <returns>
+        ///   * Status200OK (with data): If the refresh token is valid and not expired, the method returns a 200 OK response with a new LoginResponse object containing a new JWT token, its expiration date, and the same refresh token (optional based on implementation).
+        ///   * Status401Unauthorized (no data): If the access token is invalid, the refresh token is invalid or expired, or the user is not found, the method returns a 401 Unauthorized response.
+        ///   * Status500InternalServerError (no data): If an unexpected error occurs during refresh, the method returns a 500 Internal Server Error response with a generic error message. Consider providing more specific error details in a production environment.
+        /// </returns>
         [HttpPost("refresh")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -122,6 +149,17 @@ namespace LOTApp.Controllers.Api
             });
         }
 
+        /// <summary>
+        /// Revokes the refresh token associated with the currently authorized user.
+        /// </summary>
+        /// <remarks>
+        /// This method requires authorization (e.g., valid access token) and only allows a user to revoke their own refresh token.
+        /// </remarks>
+        /// <returns>
+        ///   * Status200OK (no data): If the refresh token is successfully revoked (set to null), the method returns a 200 OK response with no content in the body.
+        ///   * Status401Unauthorized (no data): If the user is not authorized or cannot be found, the method returns a 401 Unauthorized response.
+        ///   * Status500InternalServerError (no data): If an unexpected error occurs during revocation, the method returns a 500 Internal Server Error response with a generic error message. Consider providing more specific error details in a production environment.
+        /// </returns>
         [Authorize]
         [HttpDelete("revoke")]
         [ProducesResponseType(StatusCodes.Status200OK)]
