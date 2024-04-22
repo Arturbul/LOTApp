@@ -34,7 +34,7 @@ namespace LOTApp.Controllers.Api
         /// <param name="departTimeTo">(DateTime?): An optional DateTime object representing the latest departure time for flights in the search.</param>
         /// <param name="departLocation">(string?): An optional string representing the departure location to search for required IATA Airport Commercial service mark ex. 'KTW'".</param>
         /// <param name="arrivalLocation">(string?): An optional string representing the arrival location to search for required IATA Airport Commercial service mark ex. 'KTW'".</param>
-        /// <param name="planeType"> (string?): An optional string representing a specific plane type to search for. ex. 'Boeing'</param>
+        /// <param name="planeType"> (string?): An optional string representing a specific plane type to search for. ex. 'Boeing', PlaneTypes are defined in PlaneType enum</param>
         /// <remarks>
         /// This example demonstrates a search for flights departing after 2024-04-23 12:00 PM and arriving in Katowice:
         /// <code>
@@ -94,6 +94,7 @@ namespace LOTApp.Controllers.Api
         /// </summary>
         /// <param name="flightDTO">A Flight object containing the details of the new flight to be created.</param>
         /// <remarks>
+        /// PlaneTypes are defined in PlaneType enum
         /// Sample request:
         /// <code>
         /// POST api/flights
@@ -140,6 +141,7 @@ namespace LOTApp.Controllers.Api
         /// <param name="id">An integer representing the unique identifier of the flight to be updated.</param>
         /// <param name="flightVM">A FlightViewModel object containing the updated details for the flight.</param>
         /// <remarks>
+        /// PlaneTypes are defined in PlaneType enum
         /// Sample request:
         /// <code>
         /// POST api/flights
