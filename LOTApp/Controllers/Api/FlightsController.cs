@@ -29,21 +29,22 @@ namespace LOTApp.Controllers.Api
         /// This method retrieves flight information based on various search criteria. It allows for anonymous access
         /// </summary>
         /// <param name="id">(int?): An optional integer representing a specific flight ID to search for.</param>
-        /// <param name="flightNumber">(string?): An optional string representing a flight number to search for.</param>
+        /// <param name="flightNumber">(string?): An optional string representing a flight number to search for, required IATA (marketing) code ex. LO123</param>
         /// <param name="departTimeFrom"> (DateTime?): An optional DateTime object representing the earliest departure time for flights in the search. ex. "2024-04-23T12:00:00"</param>
         /// <param name="departTimeTo">(DateTime?): An optional DateTime object representing the latest departure time for flights in the search.</param>
-        /// <param name="departLocation">(string?): An optional string representing the departure location to search for.</param>
-        /// <param name="arrivalLocation">(string?): An optional string representing the arrival location to search for.</param>
-        /// <param name="planeType"> (string?): An optional string representing a specific plane type to search for.</param>
-        /// <example>
+        /// <param name="departLocation">(string?): An optional string representing the departure location to search for required IATA Airport Commercial service mark ex. 'KTW'".</param>
+        /// <param name="arrivalLocation">(string?): An optional string representing the arrival location to search for required IATA Airport Commercial service mark ex. 'KTW'".</param>
+        /// <param name="planeType"> (string?): An optional string representing a specific plane type to search for. ex. 'Boeing'</param>
+        /// <remarks>
         /// This example demonstrates a search for flights departing after 2024-04-23 12:00 PM and arriving in Katowice:
-        /// ```json
+        /// <code>
+        /// GET api/flights
         /// {
         ///   "departTimeFrom": "2024-04-23T12:00:00",
         ///   "arrivalLocation": "KTW"
         /// }
-        /// ```
-        /// </example>
+        /// </code>
+        /// </remarks>
         /// <returns>Status200OK (with data): If flights matching the search criteria are found, the method returns a list of FlightViewModel objects, 
         /// Status404NotFound (no data): If no flights are found that match the search criteria
         /// </returns>
@@ -92,6 +93,19 @@ namespace LOTApp.Controllers.Api
         /// This method requires authorization (valid access token).
         /// </summary>
         /// <param name="flightDTO">A Flight object containing the details of the new flight to be created.</param>
+        /// <remarks>
+        /// Sample request:
+        /// <code>
+        /// POST api/flights
+        /// {
+        ///   "flightNumber": "LO123",
+        ///   "departTime": "2024-04-22T09:01:17.507Z",
+        ///   "departLocation": "KTW",
+        ///   "arrivalLocation": "KRK",
+        ///   "planeType": "Boeing"
+        /// }
+        /// </code>
+        /// </remarks>
         /// <returns>
         ///   * Status201Created (with data): If the flight is successfully created, the method returns a 201 Created response with the newly created FlightViewModel object in the body.
         ///   * Status400BadRequest (no data): If the provided flight data is invalid or fails validation, the method returns a 400 Bad Request response with details about the validation errors in the ModelState.
@@ -125,6 +139,20 @@ namespace LOTApp.Controllers.Api
         /// </summary>
         /// <param name="id">An integer representing the unique identifier of the flight to be updated.</param>
         /// <param name="flightVM">A FlightViewModel object containing the updated details for the flight.</param>
+        /// <remarks>
+        /// Sample request:
+        /// <code>
+        /// POST api/flights
+        /// {
+        ///     "id": 1,
+        ///     "flightNumber": "SD123",
+        ///     "departTime": "2024-04-22T08:44:44.587",
+        ///     "departLocation": "SDA",
+        ///     "arrivalLocation": "DDS",
+        ///     "planeType": 0
+        /// }
+        /// </code>
+        /// </remarks>
         /// <returns>
         ///   * Status200OK (with data): If the flight is successfully updated, the method returns a 200 OK response with the updated FlightViewModel object in the body.
         ///   * Status400BadRequest (no data): If the provided flight data is invalid, there's a mismatch between the ID in the URL and the object, or validation fails, the method returns a 400 Bad Request response with details about the errors in the ModelState.

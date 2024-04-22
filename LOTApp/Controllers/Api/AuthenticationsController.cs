@@ -11,7 +11,7 @@ using System.Text;
 namespace LOTApp.Controllers.Api
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/authentications")]
     public class AuthenticationsController : Controller
     {
         private readonly UserManager<AppUser> _userManager;
@@ -29,6 +29,18 @@ namespace LOTApp.Controllers.Api
         /// Registers a new user in the system.
         /// </summary>
         /// <param name="model">A RegistrationModel object containing the user's registration details.</param>
+        /// <remarks>
+        /// Sample request with admin claim:
+        /// <code>
+        ///     POST api/authentications/register
+        ///     {
+        ///         "userName": "admin",
+        ///         "password": "Ad123!",
+        ///         "email": "user@example.com",
+        ///         "role": "admin"
+        ///     }
+        /// </code>
+        /// </remarks>
         /// <returns>
         ///   * Status201Created (no data): If the user is successfully registered, the method returns a 201 Created response with no content in the body.
         ///   * Status409Conflict (no data): If a user with the same username already exists, the method returns a 409 Conflict response with a message indicating the conflict.
@@ -60,7 +72,7 @@ namespace LOTApp.Controllers.Api
             {
                 _logger.LogInformation("Register succeeded");
 
-                return Created();
+                return StatusCode(StatusCodes.Status201Created);
             }
             return StatusCode(StatusCodes.Status500InternalServerError,
                 $"Error: {result.Errors.Select(e => e.Description)}");
