@@ -30,7 +30,16 @@ namespace LOTApp.DataAccess.Data
                 .Entity<Flight>()
                 .Property(b => b.ArrivalLocation)
                 .HasConversion(v => v.ToUpper(), v => v.ToUpper());
-            //relations
+
+            modelBuilder.Entity<Flight>()
+                .HasIndex(p => new
+                {
+                    p.FlightNumber,
+                    p.DepartTime,
+                    p.DepartLocation,
+                    p.ArrivalLocation,
+                    p.PlaneType,
+                }).IsUnique();
         }
     }
 }

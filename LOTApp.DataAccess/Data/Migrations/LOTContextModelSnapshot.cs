@@ -32,11 +32,11 @@ namespace LOTApp.DataAccess.data.migrations
 
                     b.Property<string>("ArrivalLocation")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("DepartLocation")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("DepartTime")
                         .HasColumnType("datetime2");
@@ -49,6 +49,9 @@ namespace LOTApp.DataAccess.data.migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("FlightNumber", "DepartTime", "DepartLocation", "ArrivalLocation", "PlaneType")
+                        .IsUnique();
 
                     b.ToTable("Flights");
                 });

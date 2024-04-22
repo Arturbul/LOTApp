@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace LOTApp.DataAccess.data.migrations
 {
     /// <inheritdoc />
-    public partial class f1 : Migration
+    public partial class fu1 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -62,8 +62,8 @@ namespace LOTApp.DataAccess.data.migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     FlightNumber = table.Column<string>(type: "NVARCHAR(6)", nullable: false),
                     DepartTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    DepartLocation = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ArrivalLocation = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DepartLocation = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ArrivalLocation = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     PlaneType = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -215,6 +215,12 @@ namespace LOTApp.DataAccess.data.migrations
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Flights_FlightNumber_DepartTime_DepartLocation_ArrivalLocation_PlaneType",
+                table: "Flights",
+                columns: new[] { "FlightNumber", "DepartTime", "DepartLocation", "ArrivalLocation", "PlaneType" },
+                unique: true);
         }
 
         /// <inheritdoc />
