@@ -22,6 +22,7 @@
         DiamondAircraft,
         Dornier,
         Dynali,
+        Embraer,
         EnstromHelicopterCorporation,
         Eurocopter,
         Fokker,
