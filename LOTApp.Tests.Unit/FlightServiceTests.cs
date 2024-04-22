@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
 using LOTApp.Business.Services;
-using LOTApp.Core.DTOs;
 using LOTApp.Core.Models;
 using LOTApp.Core.ViewModels;
 using LOTApp.DataAccess.Repositories;
+using LOTApp.WebAPI.RequestModels;
 using Moq;
 
 namespace LOTApp.Tests.Unit
@@ -15,7 +15,7 @@ namespace LOTApp.Tests.Unit
         public void Get_Always_ReturnsAllFlights()
         {
             // Arrange
-            var inputData = new FlightViewModel[]
+            var inputData = new Flight[]
             {
                 new(){Id=2   ,FlightNumber="AS123",DepartTime=DateTime.UtcNow, DepartLocation="KXR",ArrivalLocation= "BEW",PlaneType= (PlaneType) 0},
              new(){Id=3   ,FlightNumber="GH321",DepartTime=DateTime.UtcNow, DepartLocation="FZA",ArrivalLocation= "ASD",PlaneType=(PlaneType) 1},
@@ -24,7 +24,7 @@ namespace LOTApp.Tests.Unit
              new() { Id=6   ,FlightNumber="AS123",DepartTime=DateTime.UtcNow, DepartLocation="UGA",ArrivalLocation= "PEH",PlaneType= (PlaneType)0 },
             }.AsEnumerable();
 
-            var expectedData = new FlightViewModel[]
+            var expectedData = new Flight[]
            {
                 new(){Id=2   ,FlightNumber="AS123",DepartTime=DateTime.UtcNow, DepartLocation="KXR",ArrivalLocation= "BEW",PlaneType= (PlaneType) 0},
               new(){Id=3   ,FlightNumber="GH321",DepartTime=DateTime.UtcNow, DepartLocation="FZA",ArrivalLocation= "ASD",PlaneType=(PlaneType) 1},
@@ -40,18 +40,18 @@ namespace LOTApp.Tests.Unit
 
             var mockRepository = new Mock<IFlightRepository>();
             mockRepository.Setup(r => r.AllEntities)
-                .Returns(mapper.Map<IEnumerable<Flight>>(expectedData).AsQueryable());
+                .Returns(expectedData.AsQueryable());
 
             var mockService = new FlightService(mapper, mockRepository.Object);
 
-
+            var expectedVM = mapper.Map<IEnumerable<FlightViewModel>>(expectedData);
             // Act
             var result = mockService.Get();
 
             // Assert
             Assert.NotNull(result);
 
-            Assert.Equal(expectedData, result, new FlightViewModelComparer());
+            Assert.Equal(expectedVM, result, new FlightViewModelComparer());
         }
 
         [Fact]
@@ -67,7 +67,7 @@ namespace LOTApp.Tests.Unit
              new() { Id=6   ,FlightNumber="AS123",DepartTime=DateTime.UtcNow, DepartLocation="UGA",ArrivalLocation= "PEH",PlaneType= (PlaneType)0 },
             }.AsQueryable();
 
-            var expectedData = new FlightViewModel[]
+            var expectedData = new Flight[]
            {
               new(){Id=4   ,FlightNumber="AS123",DepartTime=DateTime.UtcNow, DepartLocation="FTK",ArrivalLocation= "GMY",PlaneType=(PlaneType) 2},
               new(){Id=5   ,FlightNumber="AS123",DepartTime=DateTime.UtcNow, DepartLocation="FTK",ArrivalLocation= "GMY",PlaneType=(PlaneType) 0},
@@ -80,18 +80,18 @@ namespace LOTApp.Tests.Unit
 
             var mockRepository = new Mock<IFlightRepository>();
             mockRepository.Setup(r => r.AllEntities)
-                .Returns(mapper.Map<IEnumerable<Flight>>(expectedData).AsQueryable());
+                .Returns(expectedData.AsQueryable());
 
             var mockService = new FlightService(mapper, mockRepository.Object);
 
-
+            var expectedVM = mapper.Map<IEnumerable<FlightViewModel>>(expectedData);
             // Act
             var result = mockService.Get(departLocation: "FTK");
 
             // Assert
             Assert.NotNull(result);
             Assert.NotEmpty(result);
-            Assert.Equal(expectedData, result, new FlightViewModelComparer());
+            Assert.Equal(expectedVM, result, new FlightViewModelComparer());
         }
 
         [Fact]
@@ -146,7 +146,7 @@ namespace LOTApp.Tests.Unit
              new() { Id=6   ,FlightNumber="AS123",DepartTime=DateTime.UtcNow, DepartLocation="UGA",ArrivalLocation= "PEH",PlaneType= (PlaneType)0 },
             }.AsQueryable();
 
-            var expectedData = new FlightViewModel[]
+            var expectedData = new Flight[]
            {
              new(){Id=5   ,FlightNumber="AS123",DepartTime=DateTime.UtcNow, DepartLocation="FTK",ArrivalLocation= "GMY",PlaneType=(PlaneType) 0},
            }.AsQueryable();
@@ -158,10 +158,11 @@ namespace LOTApp.Tests.Unit
 
             var mockRepository = new Mock<IFlightRepository>();
             mockRepository.Setup(r => r.AllEntities)
-                .Returns(mapper.Map<IEnumerable<Flight>>(expectedData).AsQueryable());
+                .Returns(expectedData.AsQueryable());
 
             var mockService = new FlightService(mapper, mockRepository.Object);
 
+            var expectedVM = mapper.Map<IEnumerable<FlightViewModel>>(expectedData);
 
             // Act
             var result = mockService.Get(id: 5);
@@ -169,7 +170,7 @@ namespace LOTApp.Tests.Unit
             // Assert
             Assert.NotNull(result);
             Assert.NotEmpty(result);
-            Assert.Equal(expectedData, result, new FlightViewModelComparer());
+            Assert.Equal(expectedVM, result, new FlightViewModelComparer());
         }
 
         [Fact]
@@ -185,7 +186,7 @@ namespace LOTApp.Tests.Unit
               new() { Id=6  ,FlightNumber="AS123",DepartTime=new DateTime(2024, 4, 29, 14, 0, 0), DepartLocation="UGA",ArrivalLocation= "PEH",PlaneType= (PlaneType)0 },
              }.AsQueryable();
 
-            var expectedData = new FlightViewModel
+            var expectedData = new Flight
             {
                 Id = 3,
                 FlightNumber = "GH321",
@@ -206,14 +207,14 @@ namespace LOTApp.Tests.Unit
 
             var mockService = new FlightService(mapper, mockRepository.Object);
 
-
+            var expectedVM = mapper.Map<FlightViewModel>(expectedData);
             // Act
             var searchData = 3;
             var result = mockService.GetSingle(searchData);
 
             // Assert
             Assert.NotNull(result);
-            Assert.Equal(expectedData, result, new FlightViewModelComparer());
+            Assert.Equal(expectedVM, result, new FlightViewModelComparer());
         }
 
         [Fact]
@@ -252,7 +253,7 @@ namespace LOTApp.Tests.Unit
         public async void Create_WithValidData_ReturnsFlight()
         {
             // Arrange
-            var newDataDTO = new CreateFlightDTO
+            var newDataDTO = new CreateFlightRequest
             {
                 FlightNumber = "GH321",
                 DepartTime = DateTime.UtcNow,
@@ -263,7 +264,7 @@ namespace LOTApp.Tests.Unit
 
             var mapper = new MapperConfiguration(cfg =>
             {
-                cfg.CreateMap<Flight, CreateFlightDTO>().ReverseMap();
+                cfg.CreateMap<Flight, CreateFlightRequest>().ReverseMap();
                 cfg.CreateMap<Flight, FlightViewModel>().ReverseMap();
 
             }).CreateMapper();
@@ -275,8 +276,9 @@ namespace LOTApp.Tests.Unit
 
             var service = new FlightService(mapper, mockRepository.Object);
 
+            var mappedNewData = mapper.Map<Flight>(newDataDTO);
             // Act
-            var result = await service.Create(newDataDTO);
+            var result = await service.Create(mappedNewData);
 
             // Assert
             Assert.NotNull(result);
@@ -287,7 +289,7 @@ namespace LOTApp.Tests.Unit
         public async void Update_WithValidData_ReturnsFlight()
         {
             // Arrange
-            var baseData = new FlightViewModel
+            var baseData = new Flight
             {
                 Id = 3,
                 FlightNumber = "GH321",
@@ -297,7 +299,7 @@ namespace LOTApp.Tests.Unit
                 PlaneType = (PlaneType)1
             };
 
-            var expected = new FlightViewModel
+            var expected = new Flight
             {
                 Id = 3,
                 FlightNumber = "GH321",
@@ -314,17 +316,19 @@ namespace LOTApp.Tests.Unit
 
             var mockRepository = new Mock<IFlightRepository>();
             mockRepository.Setup(r => r.Update(It.IsAny<Flight>()))
-                .Returns(Task.FromResult(mapper.Map<Flight>(expected)))
+                .Returns(Task.FromResult(expected))
                 .Verifiable();
 
             var service = new FlightService(mapper, mockRepository.Object);
+
+            var expectedMapped = mapper.Map<FlightViewModel>(expected);
 
             // Act
             var result = await service.Update(expected);
 
             // Assert
             Assert.NotNull(result);
-            Assert.Equal(expected, result, new FlightViewModelComparer());
+            Assert.Equal(expectedMapped, result, new FlightViewModelComparer());
             mockRepository.VerifyAll();
         }
     }

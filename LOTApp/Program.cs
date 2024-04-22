@@ -2,18 +2,17 @@ using FluentValidation;
 using LOTApp.Business;
 using LOTApp.Business.Mappers;
 using LOTApp.Core.Authentication;
-using LOTApp.Core.DTOs;
 using LOTApp.Core.ViewModels;
 using LOTApp.DataAccess.Data;
+using LOTApp.WebAPI.Mappers;
+using LOTApp.WebAPI.RequestModels;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.IdentityModel.Tokens.Jwt;
-using System.Reflection;
 using System.Text;
-
 
 public class Program
 {
@@ -69,8 +68,8 @@ public class Program
         //Swagger
         builder.Services.AddSwaggerGen(options =>
         {
-            var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-            options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+            List<string> xmlFiles = Directory.GetFiles(AppContext.BaseDirectory, "*.xml", SearchOption.TopDirectoryOnly).ToList();
+            xmlFiles.ForEach(xmlFile => options.IncludeXmlComments(xmlFile));
 
             //Swagger JWT
             options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -103,13 +102,17 @@ public class Program
 
 
         //Automapper
-        builder.Services.AddAutoMapper(typeof(FlightProfile));
+        builder.Services.AddAutoMapper(
+            typeof(FlightWebAPIProfile),
+            typeof(FlightServiceProfile)
+            );
 
         //FluentValidation
         builder.Services.AddScoped<IValidator<FlightViewModel>, FlightViewModelValidator>();
-        builder.Services.AddScoped<IValidator<CreateFlightDTO>, CreateFlightDTOValidator>();
+        builder.Services.AddScoped<IValidator<CreateFlightRequest>, CreateFlightRequestValidator>();
+        builder.Services.AddScoped<IValidator<UpdateFlightRequest>, UpdateFlightRequestValidator>();
 
-
+        //Build
         var app = builder.Build();
 
         // Configure the HTTP request pipeline.

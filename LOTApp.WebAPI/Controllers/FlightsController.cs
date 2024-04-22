@@ -1,28 +1,32 @@
-﻿using FluentValidation;
-using LOTApp.Attribiutes;
+﻿using AutoMapper;
+using FluentValidation;
 using LOTApp.Business.Services;
 using LOTApp.Core.Authentication;
-using LOTApp.Core.DTOs;
-using LOTApp.Core.Extensions;
 using LOTApp.Core.Models;
 using LOTApp.Core.ViewModels;
+using LOTApp.WebAPI.Attribiutes;
+using LOTApp.WebAPI.Extensions;
+using LOTApp.WebAPI.RequestModels;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace LOTApp.Controllers
+namespace LOTApp.WebAPI.Controllers
 {
     [ApiController]
     [Route("api/flights")]
     public class FlightsController : Controller
     {
         private readonly IFlightService _flightService;
-        private readonly IValidator<FlightViewModel> _viewModelValidator;
-        private readonly IValidator<CreateFlightDTO> _createFlightValidator;
-        public FlightsController(IFlightService flightManager, IValidator<FlightViewModel> viewModelValidator, IValidator<CreateFlightDTO> createFlightValidator)
+        private readonly IMapper _mapper;
+        private readonly IValidator<CreateFlightRequest> _createFlightValidator;
+        private readonly IValidator<UpdateFlightRequest> _updateFlightValidator;
+        public FlightsController(IFlightService flightManager, IValidator<CreateFlightRequest> createFlightValidator, IMapper mapper, IValidator<UpdateFlightRequest> updateFlightValidator)
         {
             _flightService = flightManager;
-            _viewModelValidator = viewModelValidator;
+            _mapper = mapper;
             _createFlightValidator = createFlightValidator;
+            _updateFlightValidator = updateFlightValidator;
         }
 
         /// <summary>
@@ -55,9 +59,8 @@ namespace LOTApp.Controllers
         public IActionResult Get(int? id, string? flightNumber, DateTime? departTimeFrom, DateTime? departTimeTo,
                                  string? departLocation, string? arrivalLocation, string? planeType)
         {
-            Enum.TryParse(planeType, true, out PlaneType resultType);
             var flights = _flightService.Get(id, flightNumber, departTimeFrom, departTimeTo, departLocation,
-                                             arrivalLocation, resultType);
+                                             arrivalLocation, planeType);
             if (flights == null)
             {
                 return NotFound();
@@ -92,7 +95,7 @@ namespace LOTApp.Controllers
         /// Creates a new flight record in the system.
         /// This method requires authorization (valid access token).
         /// </summary>
-        /// <param name="flightDTO">A Flight object containing the details of the new flight to be created.</param>
+        /// <param name="flightRequest">A CreateFlightRequest object containing the details of the new flight to be created.</param>
         /// <remarks>
         /// PlaneTypes are defined in PlaneType enum
         /// Sample request:
@@ -117,16 +120,16 @@ namespace LOTApp.Controllers
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(FlightViewModel))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Create(CreateFlightDTO flightDTO)
+        public async Task<IActionResult> Create(CreateFlightRequest flightRequest)
         {
-            var validationResult = await _createFlightValidator.ValidateAsync(flightDTO);
+            var validationResult = await _createFlightValidator.ValidateAsync(flightRequest);
             if (!ModelState.IsValid || !validationResult.IsValid)
             {
                 validationResult.AddToModelState(ModelState);
                 return BadRequest(ModelState);
             }
-
-            var result = await _flightService.Create(flightDTO);
+            var flightMapped = _mapper.Map<Flight>(flightRequest);
+            var result = await _flightService.Create(flightMapped);
             if (ModelState.IsValid)
             {
                 return Created(string.Empty, result);
@@ -139,7 +142,7 @@ namespace LOTApp.Controllers
         /// This method requires authorization (valid access token).
         /// </summary>
         /// <param name="id">An integer representing the unique identifier of the flight to be updated.</param>
-        /// <param name="flightVM">A FlightViewModel object containing the updated details for the flight.</param>
+        /// <param name="flightRequest">A UpdateFlightRequest object containing the updated details for the flight.</param>
         /// <remarks>
         /// PlaneTypes are defined in PlaneType enum
         /// Sample request:
@@ -165,19 +168,20 @@ namespace LOTApp.Controllers
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(FlightViewModel))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Update(int id, FlightViewModel flightVM)
+        public async Task<IActionResult> Update(int id, UpdateFlightRequest flightRequest)
         {
-            if (id != flightVM.Id)
+            if (id != flightRequest.Id)
             {
                 return BadRequest("Id mismatch");
             }
-            var validationResult = await _viewModelValidator.ValidateAsync(flightVM);
+            var validationResult = await _updateFlightValidator.ValidateAsync(flightRequest);
             if (!ModelState.IsValid || !validationResult.IsValid)
             {
                 validationResult.AddToModelState(ModelState);
                 return BadRequest(ModelState);
             }
-            var result = await _flightService.Update(flightVM);
+            var flightMapped = _mapper.Map<Flight>(flightRequest);
+            var result = await _flightService.Update(flightMapped);
             if (ModelState.IsValid)
             {
                 return Ok(result);
@@ -195,10 +199,10 @@ namespace LOTApp.Controllers
         ///   * Status404NotFound (no data): If no flight is found with the provided ID, the method returns a 404 Not Found response.
         /// </returns>
         [Authorize]
-        [RequiresClaim(IdentityData.AdminUserClaimName, "true")]
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(int))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [RequiresClaim(IdentityData.AdminUserClaimName, "true")]
         public async Task<IActionResult> Delete(int id)
         {
             var result = await _flightService.Delete(id);

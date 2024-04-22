@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace LOTApp.Core.DTOs
+namespace LOTApp.WebAPI.RequestModels
 {
-    public class CreateFlightDTO
+    public class CreateFlightRequest
     {
         [Required]
         public string FlightNumber { get; set; } = null!;

@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace LOTApp.Attribiutes
+namespace LOTApp.WebAPI.Attribiutes
 {
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]
     public class RequiresClaimAttribute : Attribute, IAuthorizationFilter

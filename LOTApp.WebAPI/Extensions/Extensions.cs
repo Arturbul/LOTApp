@@ -1,7 +1,7 @@
 ﻿using FluentValidation.Results;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
-namespace LOTApp.Core.Extensions
+namespace LOTApp.WebAPI.Extensions
 {
     public static class Extensions
     {

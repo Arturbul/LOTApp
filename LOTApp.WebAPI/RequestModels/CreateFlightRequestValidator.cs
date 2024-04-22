@@ -1,11 +1,11 @@
 ﻿using FluentValidation;
 using LOTApp.Core.Models;
 
-namespace LOTApp.Core.DTOs
+namespace LOTApp.WebAPI.RequestModels
 {
-    public class CreateFlightDTOValidator : AbstractValidator<CreateFlightDTO>
+    public class CreateFlightRequestValidator : AbstractValidator<CreateFlightRequest>
     {
-        public CreateFlightDTOValidator()
+        public CreateFlightRequestValidator()
         {
             RuleFor(x => x.FlightNumber).NotEmpty();
             RuleFor(x => x.FlightNumber).MaximumLength(6);

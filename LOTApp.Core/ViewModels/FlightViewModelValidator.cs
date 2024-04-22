@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using LOTApp.Core.Models;
 
 namespace LOTApp.Core.ViewModels
 {
@@ -26,7 +27,7 @@ namespace LOTApp.Core.ViewModels
               .Matches(@"^[a-zA-Z]{3}$$")
               .WithMessage("required IATA Airport Commercial service mark ex. 'KTW'");
 
-            RuleFor(x => x.PlaneType).IsInEnum();
+            RuleFor(x => x.PlaneType).IsEnumName(typeof(PlaneType), caseSensitive: false);
         }
     }
 }

@@ -23,6 +23,7 @@
   <ItemGroup>
     <ProjectReference Include="..\LOTApp.Core\LOTApp.Core.csproj" />
     <ProjectReference Include="..\LOTApp.Business\LOTApp.Business.csproj" />
+    <ProjectReference Include="..\LOTApp.WebAPI\LOTApp.WebAPI.csproj" />
   </ItemGroup>
 
 </Project>

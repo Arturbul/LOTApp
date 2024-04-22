@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using LOTApp.Core.DTOs;
 using LOTApp.Core.Models;
 using LOTApp.Core.ViewModels;
 using LOTApp.DataAccess.Repositories;
@@ -23,7 +22,7 @@ namespace LOTApp.Business.Services
             DateTime? departTimeTo = null,
             string? departLocation = null,
             string? arrivalLocation = null,
-            PlaneType? planeType = null
+            string? planeType = null
             )
         {
             var query = _repository.AllEntities;
@@ -60,7 +59,8 @@ namespace LOTApp.Business.Services
 
             if (planeType != null)
             {
-                query = query.Where(x => x.PlaneType.Equals(planeType));
+                Enum.TryParse(planeType, true, out PlaneType resultType);
+                query = query.Where(x => x.PlaneType.Equals(resultType));
             }
 
             return _mapper.Map<IEnumerable<FlightViewModel>>(query.ToList());
@@ -70,17 +70,15 @@ namespace LOTApp.Business.Services
         {
             return _mapper.Map<FlightViewModel>(_repository.AllEntities.SingleOrDefault(x => x.Id == id));
         }
-        public async Task<FlightViewModel> Create(CreateFlightDTO entityDTO)
+        public async Task<FlightViewModel> Create(Flight flight)
         {
-            var entity = _mapper.Map<Flight>(entityDTO);
-            var result = await _repository.Create(entity);
+            var result = await _repository.Create(flight);
 
             return _mapper.Map<FlightViewModel>(result);
         }
-        public async Task<FlightViewModel> Update(FlightViewModel entityVM)
+        public async Task<FlightViewModel> Update(Flight flight)
         {
-            var entity = _mapper.Map<Flight>(entityVM);
-            var result = await _repository.Update(entity);
+            var result = await _repository.Update(flight);
 
             return _mapper.Map<FlightViewModel>(result);
         }

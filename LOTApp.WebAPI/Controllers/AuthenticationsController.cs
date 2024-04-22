@@ -1,14 +1,17 @@
 ﻿using LOTApp.Core.Authentication;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace LOTApp.Controllers
+namespace LOTApp.WebAPI.Controllers
 {
     [ApiController]
     [Route("api/authentications")]
